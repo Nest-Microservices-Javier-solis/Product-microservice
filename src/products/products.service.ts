@@ -32,7 +32,7 @@ export class ProductsService extends PrismaClient implements OnModuleInit {
     })
     if (!data.length) throw new NotFoundException('Esta página no existe ')
 
-    const totalProduct = await this.product.count()
+    const totalProduct = await this.product.count({ where: { avilable: true } })
     const totalPage = Math.ceil(totalProduct / 5)
     return { data, meta: { totalProduct, page, totalPage } };
   }

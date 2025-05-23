@@ -1,8 +1,11 @@
 import { Type } from "class-transformer";
-import { IsNotEmpty, IsNumber, IsOptional, IsString } from "class-validator";
+import { IsNotEmpty, IsNumber, IsOptional, IsPositive, IsString } from "class-validator";
 
 
 export class UpdateProductDto {
+    @IsNumber()
+    @IsPositive()
+    id:number
     @IsString()
     @IsOptional()
     name?: string;
