@@ -27,7 +27,8 @@ export class ProductsService extends PrismaClient implements OnModuleInit {
 
     const data = await this.product.findMany({
       take,
-      skip
+      skip,
+      where: { avilable: !false }
     })
     if (!data.length) throw new NotFoundException('Esta página no existe ')
 
@@ -46,9 +47,18 @@ export class ProductsService extends PrismaClient implements OnModuleInit {
   }
 
   async update(id: number, updateProductDto: UpdateProductDto) {
-    await this.findOne(id)
+    const find = await this.findOne(id)
+
+    const { name, price } = updateProductDto
+
+
+    const Data = {
+      name: name ? name : find.name,
+      price: price ? price : find.price
+    }
+
     try {
-      await this.product.update({ where: { id }, data: updateProductDto })
+      await this.product.update({ where: { id }, data: Data })
       return { message: 'Producto Actualizado Correctamente' }
 
 
@@ -60,6 +70,6 @@ export class ProductsService extends PrismaClient implements OnModuleInit {
 
   async remove(id: number) {
     await this.findOne(id)
-    return this.product.delete({ where: { id } });
+    return await this.product.update({ where: { id }, data: { avilable: false } })
   }
 }
