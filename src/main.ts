@@ -9,7 +9,7 @@ async function bootstrap() {
     {
       transport: Transport.TCP,
       options: {
-        port: 3000
+        port: 3001
       }
     }
   );
@@ -22,7 +22,7 @@ async function bootstrap() {
   )
   await app.listen();
 
-  logger.log(`Servidor Corriendo en el puerto ${process.env.PORT}`)
+  logger.log(`Servidor Corriendo en el puerto ${3001}`)
   
 }
 bootstrap();

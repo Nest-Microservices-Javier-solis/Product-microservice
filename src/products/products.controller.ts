@@ -1,9 +1,9 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete, Query, Put, ParseIntPipe } from '@nestjs/common';
+import { Controller, Get, Post, Param, Delete, Query, Put, ParseIntPipe } from '@nestjs/common';
 import { ProductsService } from './products.service';
 import { CreateProductDto } from './dto/create-product.dto';
 import { UpdateProductDto } from './dto/update-product.dto';
 import { PaginationDto } from 'src/dto/pagination.dto';
-import { zip } from 'rxjs';
+
 import { MessagePattern, Payload } from '@nestjs/microservices';
 
 @Controller('products')
@@ -18,13 +18,14 @@ export class ProductsController {
 
   @Get()
   @MessagePattern({ cmd: 'find_all_product' }) //microservidios
-  findAll(@Query() paginationDto: PaginationDto) {
+  findAll(@Payload() paginationDto: PaginationDto) {
     return this.productsService.findAll(paginationDto);
   }
 
   @Get(':id')
   @MessagePattern({ cmd: 'find_one_product' })
-  findOne(@Param('id', ParseIntPipe) id: number) {
+  findOne(@Payload('id', ParseIntPipe) id: number) {
+
     return this.productsService.findOne(id);
   }
 
@@ -36,7 +37,7 @@ export class ProductsController {
 
   @Delete(':id')
   @MessagePattern({ cmd: 'delete_product' })
-  remove(@Param('id', ParseIntPipe) id: number) {
+  remove(@Payload('id', ParseIntPipe) id: number) {
     return this.productsService.remove(id); //comentario
   }
 }

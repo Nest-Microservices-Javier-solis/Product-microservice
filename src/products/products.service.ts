@@ -1,10 +1,11 @@
-import { Injectable, Logger, NotFoundException, OnModuleInit } from '@nestjs/common';
+import { HttpStatus, Injectable, Logger, NotFoundException, OnModuleInit } from '@nestjs/common';
 import { CreateProductDto } from './dto/create-product.dto';
 import { UpdateProductDto } from './dto/update-product.dto';
 import { PrismaClient } from 'generated/prisma';
 import { PaginationDto } from 'src/dto/pagination.dto';
 import { paginationConfig } from 'src/dto/paginationFun';
 import { PrismaClientOptions } from 'generated/prisma/runtime/library';
+import { RpcException } from '@nestjs/microservices';
 
 @Injectable()
 export class ProductsService extends PrismaClient implements OnModuleInit {
@@ -22,7 +23,7 @@ export class ProductsService extends PrismaClient implements OnModuleInit {
   }
 
   async findAll(paginationDto: PaginationDto) {
-    const { limit: take, page } = paginationDto
+    const { take, page } = paginationDto
     const skip = paginationConfig(page!, take!)
 
     const data = await this.product.findMany({
@@ -30,7 +31,7 @@ export class ProductsService extends PrismaClient implements OnModuleInit {
       skip,
       where: { avilable: !false }
     })
-    if (!data.length) throw new NotFoundException('Esta página no existe ')
+    if (!data.length) throw new RpcException({ status: HttpStatus.NOT_FOUND, message: 'Pagina no encontrada' })
 
     const totalProduct = await this.product.count({ where: { avilable: true } })
     const totalPage = Math.ceil(totalProduct / 5)
@@ -41,7 +42,8 @@ export class ProductsService extends PrismaClient implements OnModuleInit {
 
     const product = await this.product.findUnique({ where: { id } });
     if (!product) {
-      throw new NotFoundException({ message: 'Producto no encontrado' })
+      throw new RpcException({ status: HttpStatus.NOT_FOUND, message: 'Producto no encontrado' })
+
     }
     return product
   }
