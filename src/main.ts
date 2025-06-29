@@ -1,28 +1,28 @@
 import { NestFactory } from '@nestjs/core';
 import { AppModule } from './app.module';
-import { Logger, ValidationPipe } from '@nestjs/common';
+import { Logger } from '@nestjs/common';
 import { MicroserviceOptions, Transport } from '@nestjs/microservices';
+import { environment } from './config/envs';
+
 
 async function bootstrap() {
+  console.log(environment.SERVER)
   const logger = new Logger()
   const app = await NestFactory.createMicroservice<MicroserviceOptions>(AppModule,
     {
-      transport: Transport.TCP,
+      transport: Transport.NATS,
       options: {
-        port: 3001
+        servers: environment.SERVER,
       }
     }
   );
 
-  app.useGlobalPipes(
-    new ValidationPipe({
-      whitelist: true,
-      forbidNonWhitelisted: true
-    })
-  )
+
+
+
   await app.listen();
 
   logger.log(`Servidor Corriendo en el puerto ${3001}`)
-  
+
 }
 bootstrap();

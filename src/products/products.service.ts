@@ -1,4 +1,4 @@
-import { HttpStatus, Injectable, Logger, NotFoundException, OnModuleInit } from '@nestjs/common';
+import { HttpStatus, Injectable, Logger, Next, NotFoundException, OnModuleInit } from '@nestjs/common';
 import { CreateProductDto } from './dto/create-product.dto';
 import { UpdateProductDto } from './dto/update-product.dto';
 import { PrismaClient } from 'generated/prisma';
@@ -6,6 +6,9 @@ import { PaginationDto } from 'src/dto/pagination.dto';
 import { paginationConfig } from 'src/dto/paginationFun';
 import { PrismaClientOptions } from 'generated/prisma/runtime/library';
 import { RpcException } from '@nestjs/microservices';
+import { CreateOrderDto } from './dto/order-product.dto';
+import { firstValueFrom } from 'rxjs';
+import { NextFunction } from 'express';
 
 @Injectable()
 export class ProductsService extends PrismaClient implements OnModuleInit {
@@ -74,4 +77,28 @@ export class ProductsService extends PrismaClient implements OnModuleInit {
     await this.findOne(id)
     return await this.product.update({ where: { id }, data: { avilable: false } })
   }
+
+  async verify(orderDto: CreateOrderDto) {
+    const { items } = orderDto;
+    const validados: any = []
+
+    for (const item of items) {
+      const product = await this.product.findUnique({ where: { id: item.id } });
+      if (!product) {
+        throw new RpcException({
+          status: HttpStatus.NOT_FOUND,
+          message: `Producto con id ${item.id} no encontrado`,
+        });
+      }
+      validados.push({
+        id: product.id,
+        name: product.name,
+        price: product.price,
+        quantity: item.quantity,
+      });
+    }
+
+    return { "items": validados };
+  }
+
 }

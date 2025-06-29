@@ -5,6 +5,7 @@ import { UpdateProductDto } from './dto/update-product.dto';
 import { PaginationDto } from 'src/dto/pagination.dto';
 
 import { MessagePattern, Payload } from '@nestjs/microservices';
+import { CreateOrderDto } from './dto/order-product.dto';
 
 @Controller('products')
 export class ProductsController {
@@ -27,6 +28,11 @@ export class ProductsController {
   findOne(@Payload('id', ParseIntPipe) id: number) {
 
     return this.productsService.findOne(id);
+  }
+  @Get('check/:id')
+  @MessagePattern({ cmd: 'verify_one_product' })
+  verifyProduct(@Payload() orderDto: CreateOrderDto) {
+    return this.productsService.verify(orderDto);
   }
 
   @Put(':id')
