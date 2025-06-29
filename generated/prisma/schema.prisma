@@ -10,8 +10,8 @@ generator client {
 }
 
 datasource db {
-  provider = "sqlite"
-  url      = env("DATABASE_URL")
+  provider = "postgresql"
+  url      = "postgresql://product_nzm1_user:ss5eM4mIswwEEo4vOES5PlKD7VJiLSPi@dpg-d1gt0kqli9vc73b32rog-a.oregon-postgres.render.com/product_nzm1"
 }
 
 model Product {
@@ -21,4 +21,6 @@ model Product {
   avilable  Boolean  @default(true)
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
+
+  @@index([avilable])
 }
